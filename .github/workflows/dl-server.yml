@@ -4,39 +4,56 @@ on:
   workflow_dispatch:
 
 jobs:
-  setup-and-run:
+  setup_and_upload:
     runs-on: ubuntu-latest
+
     steps:
-    - name: Checkout code
+    - name: Checkout repository
       uses: actions/checkout@v3
 
-    - name: Download required files
+    - name: Setup ngrok
       run: |
-        curl -L -o ltscaddstore-1.0.4-py3-none-any-eng.whl https://github.com/GuinnessShep/LTSC-ADD-Microsoft-Store/releases/download/69/ltscaddstore-1.0.4-py3-none-any-eng.whl
-        curl -L -o ltscaddstore-english-1.0.4.tar.gz https://github.com/GuinnessShep/LTSC-ADD-Microsoft-Store/releases/download/69/ltscaddstore-english-1.0.4.tar.gz
+        curl -s https://ngrok-agent.s3.amazonaws.com/ngrok.asc | sudo tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null
+        echo "deb https://ngrok-agent.s3.amazonaws.com buster main" | sudo tee /etc/apt/sources.list.d/ngrok.list
+        sudo apt update
+        sudo apt install -y ngrok
+        echo "${{ secrets.NGROK_AUTH_TOKEN }}" | ngrok authtoken
+      env:
+        NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
 
-    - name: Download and setup http-file-server
+    - name: Install and run http-file-server
       run: |
         curl -L https://github.com/sgreben/http-file-server/releases/download/1.6.1/http-file-server_1.6.1_linux_x86_64.tar.gz | tar xz
+        ./http-file-server &
 
-    - name: Install ngrok
+    - name: Expose server with ngrok
       run: |
-        sudo apt install -y snapd
-        sudo snap install ngrok
+        ngrok http 8080 &
 
-    - name: Run http-file-server in the background and expose with ngrok
-      run: |
-        nohup ./http-file-server &       # Run server in the background
-        sudo ngrok authtoken 2N5KFYmyocPObelDKx26R1e2gfP_MiFweWSd9A8CbrC1E9Ef
-        ngrok http 8080 > /dev/null &    # Expose server using ngrok in the background
-
-    - name: Wait for a few seconds for ngrok to initialize
+    - name: Wait for ngrok to initialize
       run: sleep 10
 
-    - name: Display ngrok public URL
+    - name: Get ngrok public URL
       run: |
-        curl -s http://localhost:4040/api/tunnels | jq '.tunnels[0].public_url'
-        # Extract public IP from the URL using awk or any other utility
+        curl -s http://localhost:4040/api/tunnels | jq -r ".tunnels[0].public_url"
+        echo "NGROK_PUBLIC_URL=$(curl -s http://localhost:4040/api/tunnels | jq -r ".tunnels[0].public_url")" >> $GITHUB_ENV
+        echo "NGROK_PUBLIC_IP=$(curl -s http://localhost:4040/api/tunnels | jq -r ".tunnels[0].config.addr")" >> $GITHUB_ENV
 
-    - name: Keep runner active
-      run: sleep 3600
+    - name: Download files
+      run: |
+        curl -LO https://github.com/GuinnessShep/LTSC-ADD-Microsoft-Store/releases/download/69/ltscaddstore-1.0.4-py3-none-any-eng.whl
+        curl -LO https://github.com/GuinnessShep/LTSC-ADD-Microsoft-Store/releases/download/69/ltscaddstore-english-1.0.4.tar.gz
+
+    - name: Upload files to http server
+      run: |
+        curl -F "file=@ltscaddstore-1.0.4-py3-none-any-eng.whl" ${{ env.NGROK_PUBLIC_URL }}
+        curl -F "file=@ltscaddstore-english-1.0.4.tar.gz" ${{ env.NGROK_PUBLIC_URL }}
+
+    - name: Display ngrok URL and IP
+      run: |
+        echo "Public URL: ${{ env.NGROK_PUBLIC_URL }}"
+        echo "Public IP: ${{ env.NGROK_PUBLIC_IP }}"
+
+    # Keep the runner active
+    - name: Sleep indefinitely
+      run: sleep infinity
