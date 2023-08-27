@@ -19,15 +19,16 @@ jobs:
       run: |
         curl -L https://github.com/sgreben/http-file-server/releases/download/1.6.1/http-file-server_1.6.1_linux_x86_64.tar.gz | tar xz
 
-    - name: Setup ngrok config directory
-      run: |
-        sudo mkdir -p /home/runner/.config/ngrok
-        sudo chown -R runner: /home/runner/.config
-
     - name: Install ngrok
       run: |
         sudo apt install -y snapd
         sudo snap install ngrok
+
+    - name: Setup ngrok config directory
+      run: |
+        sudo chown -R runner: /home/runner/.config/ngrok
+        touch /home/runner/.config/ngrok/ngrok.yml
+        sudo chown runner: /home/runner/.config/ngrok/ngrok.yml
 
     - name: Run http-file-server in the background and expose with ngrok
       run: |
