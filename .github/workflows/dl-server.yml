@@ -27,7 +27,7 @@ jobs:
     - name: Run http-file-server in the background and expose with ngrok
       run: |
         nohup ./http-file-server &       # Run server in the background
-        ngrok config add-authtoken ${{ secrets.NGROK_AUTH_TOKEN }}
+        ngrok authtoken ${{ secrets.NGROK_AUTH_TOKEN }}
         ngrok http 8080 > /dev/null &    # Expose server using ngrok in the background
 
     - name: Wait for a few seconds for ngrok to initialize
