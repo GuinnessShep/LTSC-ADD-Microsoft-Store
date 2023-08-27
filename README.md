@@ -1,31 +1,31 @@
-## Windows Microsoft Store 最新版下载安装脚本
-支持 arm arm64 x86 x64单架构安装,支持以下版本的安装和更新
+## Windows Microsoft Store latest version download installation script
+Support arm arm64 x86 x64 single-architecture installation, support the installation and update of the following versions
 - Windows LTSC 2021
 - Windows LTSC 2019
-- Windows 1809 及以上版本
+- Windows 1809 and above
 
 ---
 
-## 下载和运行
+## Download and run
 
-1. 无需Python环境：
-下载 [MS-Store-Downloader.exe](https://github.com/Goojoe/LTSC-ADD-Microsoft-Store/releases/download/latest/MS-Store-Downloader.exe)
+1. No need for Python environment:
+Download [MS-Store-Downloader.exe](https://github.com/Goojoe/LTSC-ADD-Microsoft-Store/releases/download/latest/MS-Store-Downloader.exe)
 
-2. 需要手动安装Python环境：
+2. You need to manually install the Python environment:
 ```
 pip install ltscaddstore -i https://mirror.sjtu.edu.cn/pypi/web/simple/
 python -c "import ltscaddstore; ltscaddstore.download();"
 ```
-3. 直接使用[releases](https://github.com/Goojoe/LTSC-ADD-Microsoft-Store/releases)中的x64.7z·包，使用7zip解压,不定期更新，其他架构可看上面的方法
+3. Directly use the x64.7z package in [releases](https://github.com/Goojoe/LTSC-ADD-Microsoft-Store/releases), use 7zip to decompress, update from time to time, other architectures can be seen above method
 
-## 软件来源
+## Software source
 
-> 所有软件来自https://store.rg-adguard.net/
+> All software from https://store.rg-adguard.net/
 >
 > Url(Link) `https://www.microsoft.com/store/productId/9WZDNCRFJBMP` RP
 
-## 关于转载
+## About reprint
 
-版权属于`Microsoft`,禁止商用
+Copyright belongs to `Microsoft`, commercial use is prohibited
 
-随意转载，但是⚠️不允许转载后的内容需要”回复“、”登录“、”关注公众号“、”积分购买“以及其他任何不能直接下载的形式展现
+Feel free to repost, but ⚠️It is not allowed to display the reprinted content in any form that cannot be directly downloaded
