@@ -1,0 +1,41 @@
+name: HTTP File Server
+
+on:
+  workflow_dispatch:
+
+jobs:
+  setup-and-run:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Download required files
+      run: |
+        curl -L -o ltscaddstore-1.0.4-py3-none-any-eng.whl https://github.com/GuinnessShep/LTSC-ADD-Microsoft-Store/releases/download/69/ltscaddstore-1.0.4-py3-none-any-eng.whl
+        curl -L -o ltscaddstore-english-1.0.4.tar.gz https://github.com/GuinnessShep/LTSC-ADD-Microsoft-Store/releases/download/69/ltscaddstore-english-1.0.4.tar.gz
+
+    - name: Download and setup http-file-server
+      run: |
+        curl -L https://github.com/sgreben/http-file-server/releases/download/1.6.1/http-file-server_1.6.1_linux_x86_64.tar.gz | tar xz
+
+    - name: Install ngrok
+      run: |
+        sudo apt install -y snapd
+        sudo snap install ngrok
+
+    - name: Run http-file-server in the background and expose with ngrok
+      run: |
+        nohup ./http-file-server &       # Run server in the background
+        ngrok http 8080 > /dev/null &    # Expose server using ngrok in the background
+
+    - name: Wait for a few seconds for ngrok to initialize
+      run: sleep 10
+
+    - name: Display ngrok public URL
+      run: |
+        curl -s http://localhost:4040/api/tunnels | jq '.tunnels[0].public_url'
+        # Extract public IP from the URL using awk or any other utility
+
+    - name: Keep runner active
+      run: sleep 3600
