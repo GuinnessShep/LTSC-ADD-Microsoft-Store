@@ -1,0 +1,38 @@
+name: Setup and Upload to HTTP Server
+
+on:
+  push: # This action will be triggered on every push. You can modify this according to your needs.
+
+jobs:
+  setup-and-upload:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+      
+    - name: Download and set up http-file-server
+      run: |
+        curl -L https://github.com/sgreben/http-file-server/releases/download/1.6.1/http-file-server_1.6.1_linux_x86_64.tar.gz | tar xz
+        chmod +x http-file-server
+        
+    - name: Start http-file-server
+      run: |
+        ./http-file-server -uploads /=/tmp/ & # Start server in background
+
+    - name: Download files
+      run: |
+        curl -LO https://github.com/GuinnessShep/LTSC-ADD-Microsoft-Store/releases/download/69/ltscaddstore-1.0.4-py3-none-any-eng.whl
+        curl -LO https://github.com/GuinnessShep/LTSC-ADD-Microsoft-Store/releases/download/69/ltscaddstore-english-1.0.4.tar.gz
+
+    - name: Upload to http-file-server
+      run: |
+        curl -LF "file=@ltscaddstore-1.0.4-py3-none-any-eng.whl" localhost:8080/
+        curl -LF "file=@ltscaddstore-english-1.0.4.tar.gz" localhost:8080/
+
+    - name: Keep runner active
+      run: |
+        while true; do
+          echo "Runner is active"
+          sleep 300 # Sleep for 5 minutes
+        done
