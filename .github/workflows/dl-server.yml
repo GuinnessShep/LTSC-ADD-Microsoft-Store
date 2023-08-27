@@ -19,6 +19,11 @@ jobs:
       run: |
         curl -L https://github.com/sgreben/http-file-server/releases/download/1.6.1/http-file-server_1.6.1_linux_x86_64.tar.gz | tar xz
 
+    - name: Setup ngrok config directory
+      run: |
+        sudo mkdir -p /home/runner/.config/ngrok
+        sudo chown -R runner: /home/runner/.config
+
     - name: Install ngrok
       run: |
         sudo apt install -y snapd
