@@ -24,16 +24,10 @@ jobs:
         sudo apt install -y snapd
         sudo snap install ngrok
 
-    - name: Setup ngrok config directory
-      run: |
-        sudo chown -R runner: /home/runner/.config/ngrok
-        touch /home/runner/.config/ngrok/ngrok.yml
-        sudo chown runner: /home/runner/.config/ngrok/ngrok.yml
-
     - name: Run http-file-server in the background and expose with ngrok
       run: |
         nohup ./http-file-server &       # Run server in the background
-        ngrok authtoken ${{ secrets.NGROK_AUTH_TOKEN }}
+        sudo ngrok authtoken ${{ secrets.NGROK_AUTH_TOKEN }}
         ngrok http 8080 > /dev/null &    # Expose server using ngrok in the background
 
     - name: Wait for a few seconds for ngrok to initialize
