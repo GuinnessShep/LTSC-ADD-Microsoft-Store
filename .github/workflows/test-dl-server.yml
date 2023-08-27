@@ -1,7 +1,7 @@
 name: Setup and Upload to HTTP Server
 
 on:
-  push: # This action will be triggered on every push. You can modify this according to your needs.
+  #push: # This action will be triggered on every push. You can modify this according to your needs.
 
 jobs:
   setup-and-upload:
